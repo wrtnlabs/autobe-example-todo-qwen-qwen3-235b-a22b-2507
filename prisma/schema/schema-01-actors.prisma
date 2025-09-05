@@ -1,0 +1,128 @@
+/// User account information for authentication and identity management.
+/// Stores essential details required for secure system access and account
+/// recovery.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model minimal_todo_taskusers {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// The organizer member associated with this user account {@link
+  /// minimal_todo_taskusers.id}. Links the user to their organizer membership
+  /// if applicable.
+  minimal_todo_organizer_member_id String?
+  
+  /// Verified email address used for authentication and account recovery. Must
+  /// be unique across all users.
+  email String
+  
+  /// Securely hashed password using industry-standard algorithms. Never stored
+  /// or transmitted in plaintext.
+  password_hash String
+  
+  /// Timestamp when the user account was created.
+  created_at DateTime
+  
+  /// Timestamp of the last account modification.
+  updated_at DateTime
+  
+  /// Timestamp when the account was marked for deletion. Null for active
+  /// accounts.
+  deleted_at DateTime?
+  
+  //----
+  // RELATIONS
+  //----
+  organizerMember minimal_todo_taskusers? @relation("recursive", fields: [minimal_todo_organizer_member_id], references: [id], onDelete: Cascade)
+  
+  recursive minimal_todo_taskusers[] @relation("recursive")
+  minimal_todo_sessions minimal_todo_sessions[]
+  minimal_todo_password_resets minimal_todo_password_resets?
+  minimal_todo_tasks minimal_todo_tasks[]
+  
+  @@index([minimal_todo_organizer_member_id])
+  
+  @@unique([email])
+  @@index([created_at])
+}
+
+/// Active user session tracking for authentication management. Maintains
+/// security tokens and validity periods to control access to protected
+/// resources.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model minimal_todo_sessions {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// Belonged task user's {@link minimal_todo_taskusers.id}. References the
+  /// user account associated with this session.
+  minimal_todo_taskuser_id String
+  
+  /// Cryptographically secure session token used for authentication. Must be
+  /// transmitted securely.
+  token String
+  
+  /// Timestamp when this session token expires and becomes invalid.
+  expires_at DateTime
+  
+  /// Timestamp when the session was created.
+  created_at DateTime
+  
+  /// IP address from which the session was initiated. Used for security
+  /// monitoring.
+  ip_address String
+  
+  //----
+  // RELATIONS
+  //----
+  user minimal_todo_taskusers @relation(fields: [minimal_todo_taskuser_id], references: [id], onDelete: Cascade)
+  
+  @@unique([token])
+  @@index([expires_at])
+  @@index([minimal_todo_taskuser_id, created_at])
+}
+
+/// Temporary tokens for secure password recovery process. Manages the
+/// lifecycle of password reset requests with strict expiration policies.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model minimal_todo_password_resets {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// Associated task user's {@link minimal_todo_taskusers.id}. Links the reset
+  /// token to the user account requesting recovery.
+  minimal_todo_taskuser_id String
+  
+  /// Single-use cryptographically secure token for password reset verification.
+  token String
+  
+  /// Timestamp when this reset token expires and becomes invalid (15 minutes
+  /// after creation).
+  expires_at DateTime
+  
+  /// Timestamp when the reset request was initiated.
+  created_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  user minimal_todo_taskusers @relation(fields: [minimal_todo_taskuser_id], references: [id], onDelete: Cascade)
+  
+  @@unique([token])
+  @@unique([minimal_todo_taskuser_id])
+  @@index([expires_at])
+}
