@@ -1,2 +1,2 @@
-export * as auth from "./auth";
-export * as minimalTodo from "./minimalTodo";
+export * as auth from "./auth/index";
+export * as minimalTodo from "./minimalTodo/index";

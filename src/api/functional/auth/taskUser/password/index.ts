@@ -1,1 +1,1 @@
-export * as resets from "./resets";
+export * as resets from "./resets/index";

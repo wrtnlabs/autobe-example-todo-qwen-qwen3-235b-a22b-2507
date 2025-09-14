@@ -161,7 +161,7 @@ export type IMinimalTodoTaskUser = {
    * that time, the account information remains in the database but is
    * inaccessible to the user and hidden from all application views.
    */
-  deleted_at?: (string & tags.Format<"date-time">) | null;
+  deleted_at?: (string & tags.Format<"date-time">) | null | undefined;
 };
 export namespace IMinimalTodoTaskUser {
   /**
