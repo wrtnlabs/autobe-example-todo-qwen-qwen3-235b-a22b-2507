@@ -1,14 +1,8 @@
 import { Module } from "@nestjs/common";
 
-import { AuthTaskuserController } from "./controllers/auth/taskUser/AuthTaskuserController";
-import { AuthTaskuserPasswordResetsController } from "./controllers/auth/taskUser/password/resets/AuthTaskuserPasswordResetsController";
-import { MinimaltodoTaskuserTasksController } from "./controllers/minimalTodo/taskUser/tasks/MinimaltodoTaskuserTasksController";
+import { TodolistBasicuserTasksController } from "./controllers/todoList/basicUser/tasks/TodolistBasicuserTasksController";
 
 @Module({
-  controllers: [
-    AuthTaskuserController,
-    AuthTaskuserPasswordResetsController,
-    MinimaltodoTaskuserTasksController,
-  ],
+  controllers: [TodolistBasicuserTasksController],
 })
 export class MyModule {}

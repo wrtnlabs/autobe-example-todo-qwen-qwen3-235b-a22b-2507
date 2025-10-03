@@ -1,0 +1,160 @@
+/// Stores system-wide configuration settings that control application
+/// behavior and features. These settings are managed by system
+/// administrators and affect the entire application's operation.
+///
+/// @namespace Systematic
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_system_settings {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// User who created this system setting. {@link todo_list_basicuser.id}.
+  created_by_id String?
+  
+  /// User who last updated this system setting. {@link todo_list_basicuser.id}.
+  updated_by_id String?
+  
+  /// Unique identifier for the system setting (e.g., 'maintenance_mode',
+  /// 'rate_limit'
+  key String
+  
+  /// Value of the system setting (e.g., 'true', '1000', '2023-01-01')
+  value String
+  
+  /// Description of what the system setting controls and its purpose
+  description String
+  
+  /// Current status of the setting (active, inactive, deprecated)
+  status String
+  
+  /// Timestamp when this setting was created
+  created_at DateTime
+  
+  /// Timestamp when this setting was last updated
+  updated_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  createdBy todo_list_basicuser? @relation("todo_list_system_settings_of_created_by_id", fields: [created_by_id], references: [id], onDelete: Cascade)
+  updatedBy todo_list_basicuser? @relation("todo_list_system_settings_of_updated_by_id", fields: [updated_by_id], references: [id], onDelete: Cascade)
+  
+  todo_list_basicuser todo_list_basicuser?
+  
+  @@index([created_by_id])
+  @@index([updated_by_id])
+  
+  @@unique([key])
+  @@index([status, created_at])
+}
+
+/// Records all significant security and administrative events within the
+/// system for compliance and monitoring purposes. These logs capture who did
+/// what and when for audit trail requirements.
+///
+/// @namespace Systematic
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_audit_logs {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// User responsible for the audited action. {@link todo_list_basicuser.id}.
+  user_id String?
+  
+  /// Type of action performed (e.g., 'login', 'password_reset',
+  /// 'settings_update')
+  action String
+  
+  /// Type of entity affected by the action (e.g., 'user', 'task', 'setting')
+  entity_type String
+  
+  /// ID of the entity affected by the action
+  entity_id String
+  
+  /// Additional details about the action in JSON format
+  details String?
+  
+  /// IP address from which the action was performed
+  ip_address String
+  
+  /// Browser/Client user agent string
+  user_agent String?
+  
+  /// Timestamp when this audit log was created
+  created_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  user todo_list_basicuser? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@unique([created_at, user_id, action])
+  @@index([action, created_at])
+  @@index([entity_type, entity_id])
+  @@index([user_id, created_at])
+  @@index([ip_address, created_at])
+}
+
+/// Captures system errors and exceptions for monitoring, debugging, and
+/// reliability improvement. These logs help identify issues and patterns in
+/// system failures.
+///
+/// @namespace Systematic
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_error_logs {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// User associated with the error context. {@link todo_list_basicuser.id}.
+  user_id String?
+  
+  /// Severity level of the error (error, warning, critical)
+  level String
+  
+  /// Error message or exception message
+  message String
+  
+  /// Full stack trace of the error in text format
+  stack_trace String?
+  
+  /// Additional context about the error in JSON format
+  context String?
+  
+  /// IP address from which the error originated
+  ip_address String
+  
+  /// Browser/Client user agent string
+  user_agent String?
+  
+  /// API endpoint or route where the error occurred
+  endpoint String
+  
+  /// HTTP method of the failed request
+  method String
+  
+  /// HTTP status code returned with the error
+  status_code Int
+  
+  /// Timestamp when this error log was created
+  created_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  user todo_list_basicuser? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@unique([created_at, level, endpoint, status_code])
+  @@index([level, created_at])
+  @@index([endpoint, created_at])
+  @@index([status_code, created_at])
+  @@index([user_id, created_at])
+}

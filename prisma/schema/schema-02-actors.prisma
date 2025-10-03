@@ -1,0 +1,141 @@
+/// Core user entity for the todo list application that represents registered
+/// users who can manage their tasks. This table stores essential user
+/// information including authentication credentials and profile data.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_basicuser {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// System settings configuration. {@link todo_list_system_settings.id}.
+  todo_list_system_settings_id String?
+  
+  /// Unique email address used for authentication and communication.
+  email String
+  
+  /// BCrypt hashed password for secure authentication.
+  password_hash String
+  
+  /// Current status of the user account (active, suspended, banned).
+  status String
+  
+  /// Timestamp when the user account was created.
+  created_at DateTime
+  
+  /// Timestamp when the user account was last updated.
+  updated_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  systemSettings todo_list_system_settings? @relation(fields: [todo_list_system_settings_id], references: [id], onDelete: Cascade)
+  
+  todo_list_system_settings_of_created_by_id todo_list_system_settings[] @relation("todo_list_system_settings_of_created_by_id")
+  todo_list_system_settings_of_updated_by_id todo_list_system_settings[] @relation("todo_list_system_settings_of_updated_by_id")
+  todo_list_audit_logs todo_list_audit_logs[]
+  todo_list_error_logs todo_list_error_logs[]
+  todo_list_basicuser_sessions todo_list_basicuser_sessions[]
+  todo_list_password_reset_tokens todo_list_password_reset_tokens?
+  todo_list_tasks todo_list_tasks[]
+  
+  @@unique([todo_list_system_settings_id])
+  
+  @@unique([email])
+  @@index([status])
+}
+
+/// User session management table that stores active authentication sessions
+/// for users. This supports the JWT-based authentication system by
+/// maintaining refresh tokens and session state.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_basicuser_sessions {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// Reference to the authenticated user. {@link todo_list_basicuser.id}.
+  todo_list_basicuser_id String
+  
+  /// Unique identifier for the user session.
+  session_id String
+  
+  /// Long-lived refresh token for maintaining user sessions.
+  refresh_token String
+  
+  /// User agent string identifying the client device/browser.
+  user_agent String?
+  
+  /// IP address from which the session was created.
+  ip_address String?
+  
+  /// Expiration timestamp for the session.
+  expires_at DateTime
+  
+  /// Timestamp when the session was created.
+  created_at DateTime
+  
+  /// Timestamp when the session was last updated.
+  updated_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  user todo_list_basicuser @relation(fields: [todo_list_basicuser_id], references: [id], onDelete: Cascade)
+  
+  @@unique([session_id])
+  @@unique([refresh_token])
+  @@index([todo_list_basicuser_id, expires_at], map: "todo_list_basicuser_sessions_todo_list_basicuser_id_ex_598e6405")
+}
+
+/// Temporary tokens used for password reset functionality that enable users
+/// to recover access to their accounts when they forget their passwords.
+///
+/// @namespace Actors
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_password_reset_tokens {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// Reference to the user requesting password reset. {@link
+  /// todo_list_basicuser.id}.
+  todo_list_basicuser_id String
+  
+  /// Cryptographically secure token for password reset verification.
+  token String
+  
+  /// Expiration timestamp after which the token becomes invalid.
+  expires_at DateTime
+  
+  /// Timestamp when the token was used for password reset.
+  used_at DateTime?
+  
+  /// Timestamp when the reset token was created.
+  created_at DateTime
+  
+  /// Timestamp when the reset token was last updated.
+  updated_at DateTime
+  
+  /// Soft delete timestamp for token revocation.
+  deleted_at DateTime?
+  
+  //----
+  // RELATIONS
+  //----
+  user todo_list_basicuser @relation(fields: [todo_list_basicuser_id], references: [id], onDelete: Cascade)
+  
+  @@unique([todo_list_basicuser_id])
+  
+  @@unique([token])
+  @@index([todo_list_basicuser_id, expires_at, used_at], map: "todo_list_password_reset_tokens_todo_list_basicuser_id_bf40ede5")
+}

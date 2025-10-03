@@ -1,0 +1,37 @@
+/// Stores individual tasks created by users in the todo list application.
+/// Each task contains the description and completion status information.
+///
+/// @namespace Tasks
+/// @author AutoBE - https://github.com/wrtnlabs/autobe
+model todo_list_tasks {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  id String @id
+  
+  /// The user who created the task. {@link todo_list_basicuser.id}.
+  todo_list_basicuser_id String
+  
+  /// The task description text entered by the user.
+  description String
+  
+  /// Indicates whether the task has been completed.
+  completed Boolean
+  
+  /// The timestamp when the task was marked as completed.
+  completed_at DateTime?
+  
+  /// The timestamp when the task was created.
+  created_at DateTime
+  
+  /// The timestamp when the task was last updated.
+  updated_at DateTime
+  
+  //----
+  // RELATIONS
+  //----
+  user todo_list_basicuser @relation(fields: [todo_list_basicuser_id], references: [id], onDelete: Cascade)
+  
+  @@index([todo_list_basicuser_id, completed, created_at])
+}

@@ -1,168 +1,266 @@
-# User Stories: Minimal Todo Application
+# Todo List Application - User Stories and Scenarios
 
-## Primary User Personas
+This document outlines the user stories and scenarios for the Todo list application, focusing on the minimal core functionality required for users to effectively manage their tasks. The application is designed to be simple and intuitive, with a focus on the essential features needed for task management.
 
-### Task-Oriented Individual
-A busy professional who juggles multiple responsibilities and needs a simple tool to track daily to-dos without complexity. They value:
-- Quick capture of tasks during busy work periods
-- Clear visibility of what needs to be done today
-- Minimal distractions from additional features
-- Reliable access across devices
+## User Personas
 
-Key Scenario: "When I hear my manager assign a new task during a meeting, I need to capture it immediately without disrupting the conversation. Adding a new task should take no more than five seconds."
+### Basic User
 
-## Core Task Lifecycle Journey
+The primary user of this Todo list application is a Basic User who needs to manage personal or work-related tasks. This persona represents the typical user who:
 
-### Task Creation Process
-WHEN a user identifies a new task they need to accomplish, THE system SHALL provide a straightforward mechanism for capturing essential details with minimal effort.
+- Needs to keep track of daily responsibilities
+- Wants a simple, no-frills interface for managing tasks
+- Values efficiency and ease of use over advanced features
+- Uses the application across multiple devices (mobile, tablet, desktop)
+- Has basic technical proficiency but is not a power user
 
-1. User initiates task creation from the main application screen
-2. System presents focused input field with clear placeholder text
-3. User enters task title (required) and optional details
-4. System validates input according to business rules
-5. User confirms creation with single action
-6. System adds task to appropriate list with visual confirmation
+This user does not require advanced features like task categorization, prioritization, or due dates, which aligns with the minimalist design philosophy of the application.
 
-**Business Rules for Task Creation**:
-- THE task title SHALL be required with minimum 3 characters
-- THE task title SHALL support up to 100 characters of alphanumeric text
-- IF a user attempts to create a task with empty title, THEN THE system SHALL display specific error message
-- THE system SHALL allow immediate task creation without mandatory due dates
-- WHERE a task has a due date, THE system SHALL visually indicate urgency based on proximity to deadline
+## Primary User Scenarios
 
-### Task Completion Process
-WHEN a user completes a task, THE system SHALL record this action while maintaining historical context for productivity tracking.
+The following scenarios represent the core workflows that the Basic User will follow when interacting with the Todo list application. These scenarios cover the essential functionality of creating, viewing, updating, and deleting tasks.
 
-1. User identifies completed task in their list
-2. User initiates completion through intuitive gesture
-3. System visually confirms task completion
-4. System updates task status and records completion timestamp
-5. System optionally moves completed task to archive view
+### Scenario 1: User Registration and Login
 
-**Business Rules for Task Completion**:
-- THE system SHALL update task status to 'completed' upon user confirmation
-- THE completion timestamp SHALL be recorded automatically in Asia/Seoul timezone
-- WHILE viewing completed tasks, THE system SHALL display completion date in user-friendly format
-- THE system SHALL NOT allow modification of completed tasks to maintain historical accuracy
-- WHEN sorting tasks, THE system SHALL prioritize incomplete tasks above completed ones
+WHEN a new user accesses the Todo list application, THE system SHALL provide a registration process that collects only essential information. The application focuses on minimalism, so registration requires only email and password.
 
-## Authentication Flow Scenarios
+WHEN a user submits registration information, THE system SHALL validate that the email is in proper format and the password meets minimum security requirements (at least 8 characters).
 
-### New User Registration
-WHEN a potential user accesses the Todo application for the first time, THE system SHALL guide them through a simple registration process that captures only essential information.
+IF the email is already registered, THEN THE system SHALL inform the user that the account already exists and prompt them to log in instead.
 
-1. User selects 'Create Account' option from login screen
-2. System presents minimal registration form with required fields
-3. User enters email address and creates secure password
-4. System validates input against business rules
-5. User receives confirmation email with verification link
-6. Upon verification, system creates account and transitions to task management
+WHEN a user attempts to log in, THE system SHALL authenticate the email and password combination and grant access to their task list upon successful verification.
 
-**Business Rules for Registration**: 
-- THE email address SHALL be validated for proper format
-- THE password SHALL require minimum 8 characters including letters and numbers
-- IF email is already registered, THEN THE system SHALL display specific message
-- THE registration process SHALL NOT include social media or third-party options (minimal scope)
+IF a user enters incorrect login credentials, THEN THE system SHALL deny the login attempt and return an appropriate error message without revealing whether the email or password was incorrect (security best practice).
 
-### Returning User Login
-WHEN a registered user attempts to access their task list, THE system SHALL authenticate their identity efficiently while maintaining security.
+WHEN a user is successfully logged in, THE system SHALL maintain their session and provide access to their personal task list.
 
-1. User enters registered email and password
-2. System validates credentials against stored information
-3. Upon verification, system establishes secure session
-4. System redirects user to their current task view
-5. System maintains session for business-relevant duration
+### Scenario 2: Creating a New Task
 
-**Business Rules for Login**:
-- THE system SHALL respond to login attempts within 2 seconds
-- IF credentials are invalid, THEN THE system SHALL provide generic error message
-- THE failed attempt counter SHALL increment with each incorrect submission
-- AFTER three failed attempts, THE system SHALL require brief cooldown period
-- THE user session SHALL remain active for 30 days of inactivity before requiring re-authentication
+WHEN a logged-in user navigates to the task creation interface, THE system SHALL present a simple form with a single text input field for the task description and a prominent "Add Task" button.
 
-## Task Management Interaction Patterns
+WHEN a user enters a task description and clicks "Add Task", THE system SHALL validate that the description is not empty and contains at least one non-whitespace character.
 
-### Daily Task Review
-WHEN a user begins their day, THE system SHALL present their tasks organized by urgency and deadline to facilitate effective planning.
+IF a user attempts to create a task with an empty description, THEN THE system SHALL prevent task creation and display a message indicating that a task description is required.
 
-```mermaid
-graph LR
-  A["Start Application"] --> B{"Today's Date"}
-  B -->| "Has Tasks" | C["Active Tasks View"]
-  C --> D{"Urgency Check"}
-  D -->| "Due Today" | E["Highlight Due Today"]
-  D -->| "Past Due" | F["Priority Past Due"]
-  D -->| "Future" | G["Standard Visibility"]
-  C --> H{"Completion Status"}
-  H -->| "All Complete" | I["Show Achievement Message"]
-  H -->| "Incomplete" | C
-```
+WHEN a valid task description is submitted, THE system SHALL add the new task to the user's list with a default status of "active" and display it immediately in the task list.
 
-**Business Flow Details**:
-- THE system SHALL load user's task list within 3 seconds of login
-- WHILE loading tasks, THE system SHALL display progress indicator
-- THE active task list SHALL sort by due date proximity (nearest first)
-- Tasks without due dates SHALL appear after dated tasks in creation order
-- Past due tasks SHALL receive visual highlight indicating urgency
+THE system SHALL record the task creation timestamp in UTC format.
 
-### Task Editing Process
-WHEN a user needs to modify an existing task, THE system SHALL facilitate this change while maintaining data integrity.
+THE system SHALL not allow task creation while the user is logged out. WHEN a logged-out user attempts to create a task, THE system SHALL redirect them to the login page first.
 
-1. User identifies task requiring modification
-2. User initiates edit process through intuitive control
-3. System presents current task details for editing
-4. User makes changes to task properties
-5. System validates updates against business rules
-6. User confirms changes with single action
-7. System saves updates and returns to task list
+THE system SHALL limit task descriptions to a maximum of 500 characters and truncate any input exceeding this limit.
 
-**Business Rules for Editing**:
-- THE system SHALL allow modification of title, description, and due date
-- THE original creation timestamp SHALL remain immutable as business record
-- IF changes violate business rules, THEN THE system SHALL specify exact issue
-- WHILE editing, THE system SHALL preserve unsaved changes during brief interruptions
-- WHERE a task becomes past due during editing, THE system SHALL update visual status
+### Scenario 3: Viewing Tasks
 
-## Error Recovery Scenarios
+WHEN a user logs in or refreshes the application, THE system SHALL retrieve and display all tasks belonging to that user, sorted chronologically with the most recently created tasks appearing first.
 
-### Input Validation Failures
-WHEN a user provides invalid input during task creation or editing, THE system SHALL guide them toward successful completion through clear recovery pathways.
+THE system SHALL clearly distinguish between active tasks and completed tasks through visual cues (such as different text styles or checkmark indicators).
 
-**Business Rules for Validation**:
-- IF task title exceeds character limit, THEN THE system SHALL truncate visually while informing user
-- WHEN entering invalid date format, THE system SHALL provide example of acceptable format
-- THE system SHALL highlight exact field causing validation failure
-- WHILE user is correcting errors, THE system SHALL preserve other entered data
-- AFTER correction, THE system SHALL automatically revalidate without requiring restart
+WHEN a user has no tasks, THE system SHALL display a friendly message encouraging them to add their first task, such as "Your list is empty! Add a new task to get started."
 
-### System Interruption Recovery
-WHEN unexpected interruptions occur during task management, THE system SHALL minimize disruption and data loss.
+THE system SHALL support pagination for task lists, displaying 20 tasks per page with navigation controls to access additional pages when needed.
 
-**Business Rules for Interruptions**:
-- IF network connectivity is lost, THEN THE system SHALL cache user actions locally
-- THE system SHALL automatically retry failed operations when connectivity resumes
-- WHILE connection is restored, THE system SHALL synchronize pending changes
-- IF conflicting changes occur during synchronization, THE system SHALL seek user resolution
-- AFTER successful recovery, THE system SHALL confirm data integrity to user
 
-## Edge Case Handling
+THE system SHALL provide a search functionality that allows users to filter their task list by entering keywords that match task descriptions.
 
-### Duplicate Task Entries
-WHEN a user attempts to create multiple tasks with identical titles, THE system SHALL accommodate this business reality while maintaining data clarity.
+WHEN a user performs a search, THE system SHALL instantly filter the displayed tasks to show only those containing the search term (case-insensitive).
 
-- THE system SHALL allow duplicate task titles (business reality: users may have multiple tasks for similar items)
-- WHILE displaying duplicate tasks, THE system SHALL provide additional context for differentiation
-- THE search function SHALL return all matching tasks when querying by title
-- WHEN sorting, THE system SHALL use creation time to order identical titles
-- THE system SHALL NOT require unique titles as this would conflict with genuine user scenarios
+### Scenario 4: Completing a Task
 
-### Past Due Task Management
-WHEN tasks remain incomplete beyond their intended deadline, THE system SHALL support user recovery without judgment.
+WHEN a user views their task list, THE system SHALL provide a clear mechanism to mark tasks as complete, such as a checkbox next to each task.
 
-- THE system SHALL visually differentiate past due tasks through color coding
-- WHILE viewing past due tasks, THE system SHALL display elapsed time since deadline
-- THE user SHALL be able to reset due date to today or future date
-- THE system SHALL NOT automatically complete past due tasks (requiring user action)
-- IF past due tasks accumulate, THE system SHALL suggest weekly review without judgment
+WHEN a user marks a task as complete, THE system SHALL update the task status to "completed" and record the completion timestamp in UTC format.
+
+THE system SHALL apply visual styling to completed tasks (e.g., strike-through text, different color) to indicate their status.
+
+THE system SHALL allow users to unmark a completed task as active by using the same completion mechanism (e.g., unchecking the checkbox).
+
+WHEN a task is unmarked as completed, THE system SHALL update the task status to "active" and clear the completion timestamp.
+
+### Scenario 5: Editing a Task
+
+WHEN a user wants to modify a task description, THE system SHALL allow them to edit any task (active or completed) by clicking an edit button or directly on the task text.
+
+WHEN a user enters edit mode, THE system SHALL present the current task description in an editable text field with "Save" and "Cancel" options.
+
+WHEN a user saves changes to a task description, THE system SHALL validate that the updated description is not empty and contains at least one non-whitespace character.
+
+IF a user attempts to save an empty task description, THEN THE system SHALL prevent the save operation and display an error message indicating that a task description is required.
+
+WHEN a valid updated description is saved, THE system SHALL update the task and reflect the changes in the task list immediately.
+
+THE system SHALL allow users to cancel the edit operation, which returns the task to its previous state without any changes.
+
+THE system SHALL maintain the creation timestamp when a task is edited, only updating the last modified timestamp.
+
+### Scenario 6: Deleting a Task
+
+WHEN a user decides to remove a task, THE system SHALL provide a delete option for each task, such as a trash can icon or delete button.
+
+WHEN a user initiates task deletion, THE system SHALL display a confirmation dialog asking the user to confirm they want to delete the task.
+
+WHEN a user confirms deletion, THE system SHALL permanently remove the task from their list and update the display accordingly.
+
+WHEN a user cancels the deletion, THE system SHALL keep the task in the list and return to the normal view.
+
+THE system SHALL provide a notification confirming that the task has been deleted successfully.
+
+THE system SHALL not allow restoration of deleted tasks as the deletion is permanent.
+
+## Alternative Flows
+
+### Password Reset Flow
+
+WHEN a user forgets their password, THE system SHALL provide a "Forgot Password" link on the login page.
+
+WHEN a user clicks "Forgot Password", THE system SHALL prompt them to enter their registered email address.
+
+WHEN a user submits their email address, THE system SHALL verify that the email exists in the system and send a password reset link to that email address if valid.
+
+IF a user enters an email that is not registered, THEN THE system SHALL display a generic message indicating that if an account exists with that email, a reset link will be sent, without confirming account existence (security best practice).
+
+THE password reset link SHALL be valid for 24 hours and SHALL be single-use only.
+
+WHEN a user clicks a valid password reset link, THE system SHALL allow them to create a new password that meets the minimum security requirements.
+
+IF a user attempts to use an expired password reset link, THEN THE system SHALL notify them that the link has expired and prompt them to request a new reset link.
+
+### Session Management
+
+WHEN a user successfully logs in, THE system SHALL issue a JWT access token with a 15-minute expiration and a refresh token with a 7-day expiration.
+
+WHEN a user makes a request with an expired access token but a valid refresh token, THE system SHALL issue a new access token through the refresh endpoint.
+
+WHEN a user's refresh token expires, THE system SHALL require the user to log in again with their credentials.
+
+WHEN a user requests to log out, THE system SHALL invalidate the refresh token on the server and instruct the client to discard the access token.
+
+THE system SHALL implement refresh token rotation, issuing a new refresh token with each refresh operation and invalidating the previous one.
+
+WHEN a user changes their password, THE system SHALL invalidate all active sessions and require re-authentication.
+
+WHEN a user attempts to use a JWT token that has been invalidated, THE system SHALL reject the request with HTTP 401 Unauthorized.
+
+### Data Synchronization Across Devices
+
+WHEN a user makes changes to their task list on one device, THE system SHALL synchronize those changes to the server immediately upon successful operation.
+
+WHEN a user accesses the application on another device, THE system SHALL retrieve the latest task data from the server on login and periodically during active use.
+
+WHEN a user regains internet connectivity after being offline, THE system SHALL initiate synchronization of any locally cached changes with the server.
+
+IF there are conflicting changes (e.g., the same task modified differently on two devices), THEN THE system SHALL resolve the conflict by accepting the change with the most recent timestamp.
+
+THE system SHALL provide real-time sync feedback, displaying an indicator when synchronization is in progress or when there are pending sync operations.
+
+## Edge Cases
+
+### Network Connectivity Issues
+
+IF a user attempts to create, update, or delete a task while offline, THEN THE application SHALL queue the operation locally and attempt to sync when connectivity is restored.
+
+WHEN a user is offline, THE application SHALL allow viewing and editing of locally cached tasks, clearly indicating the offline status to the user.
+
+IF multiple operations are queued during an extended offline period, THEN THE system SHALL execute them in chronological order when connectivity is restored.
+
+WHEN the system fails to sync changes after multiple attempts, THE system SHALL notify the user of the sync failure and suggest checking their internet connection.
+
+THE system SHALL implement exponential backoff for retry attempts to avoid overwhelming the server.
+
+### Empty or Invalid Input
+
+IF a user enters a task description consisting only of whitespace characters, THEN THE system SHALL treat this as an empty description and prevent task creation, displaying the same error message as for empty input.
+
+WHEN a user attempts to submit a task description exceeding 500 characters, THE system SHALL truncate the input to 500 characters and save the truncated version.
+
+IF a user pastes formatted text from another application, THEN THE system SHALL strip all formatting and save only the plain text content.
+
+WHEN a user tries to create multiple tasks with identical descriptions, THE system SHALL allow the creation of all tasks as they are considered distinct items.
+
+### High Volume of Tasks
+
+WHEN a user accumulates a large number of tasks (over 1,000), THE system SHALL maintain performance by optimizing data retrieval and rendering processes.
+
+THE system SHALL implement virtual scrolling for the task list to maintain UI responsiveness with large datasets.
+
+WHEN a user has many completed tasks, THE system SHALL provide an option to clear all completed tasks at once, with appropriate confirmation to prevent accidental bulk deletion.
+
+WHEN a user performs the bulk clear action, THE system SHALL remove all completed tasks from their list but preserve all pending tasks.
+
+THE system SHALL provide a performance warning if a user approaches 10,000 tasks, suggesting organization strategies.
+
+### Browser and Device Compatibility
+
+THE system SHALL function correctly across modern web browsers (Chrome, Firefox, Safari, Edge) on desktop and mobile devices.
+
+WHEN accessed on a mobile device, THE system SHALL optimize the interface for touch interaction with appropriate tap target sizes.
+
+THE system SHALL adapt to different screen sizes through responsive design principles.
+
+THE system SHALL preserve user preferences (such as list view settings) across sessions and devices through synchronization.
+
+## Error Scenarios and Recovery
+
+### Authentication Errors
+
+IF a user's authentication token is tampered with or corrupted, THEN THE system SHALL detect the invalid token and require re-authentication by redirecting to the login page.
+
+WHEN multiple failed login attempts occur (5 or more within 15 minutes), THE system SHALL implement rate limiting by temporarily locking the account for 30 minutes.
+
+WHEN an account is temporarily locked due to failed login attempts, THE system SHALL display a message indicating the lockout without specifying the exact reason.
+
+WHEN a user attempts to access the API without proper authentication, THE system SHALL return HTTP 401 Unauthorized status.
+
+WHEN a user attempts to perform an action without sufficient permissions, THE system SHALL return HTTP 403 Forbidden status.
+
+### Data Corruption
+
+IF the system detects data corruption in a user's task list, THE system SHALL attempt to recover the data from the most recent backup.
+
+WHEN data recovery is unsuccessful after multiple attempts, THE system SHALL inform the user of the issue and provide options for support contact.
+
+THE system SHALL implement regular data integrity checks to proactively identify potential corruption issues.
+
+WHEN a data integrity issue is detected, THE system SHALL quarantine the affected data and initiate recovery procedures automatically.
+
+### Browser Storage Limits
+
+WHEN local storage capacity is exceeded, THE system SHALL degrade gracefully by relying primarily on server-side storage.
+
+IF cookies are disabled in the user's browser, THE system SHALL still function but may require more frequent re-authentication.
+
+WHEN session storage is unavailable, THE system SHALL use in-memory storage for temporary data with appropriate warnings to the user.
+
+THE system SHALL detect storage limitations and inform users that some functionality may be limited.
+
+## Business Requirements
+
+THE Todo list application SHALL focus on simplicity and usability above all other considerations.
+
+THE system SHALL respond to task creation requests within 2 seconds under normal load conditions.
+
+THE application SHALL support users in multiple geographic regions with proper localization of the user interface.
+
+THE system SHALL protect user data through HTTPS encryption for all communications.
+
+THE application SHALL comply with relevant data privacy regulations such as GDPR or CCPA, providing users with the ability to download or delete their data upon request.
+
+THE system SHALL provide a reliable service with 99.9% uptime excluding scheduled maintenance periods.
+
+THE application SHALL handle at least 10,000 concurrent users without significant performance degradation.
+
+All user interactions SHALL provide immediate visual feedback to indicate that the system has received and is processing the request.
+
+THE system SHALL never lose user data under normal operating conditions.
+
+THE application SHALL provide clear, user-friendly error messages that help users understand issues and how to resolve them, avoiding technical jargon.
+
+THE system SHALL implement automated monitoring and alerting for critical failures.
+
+THE application SHALL provide a maintenance window notification at least 24 hours in advance for planned downtime exceeding 15 minutes.
+
+The user onboarding process SHALL be completed within 2 minutes for new users.
+
+The application SHALL support keyboard navigation for accessibility compliance.
 
 > *Developer Note: This document defines **business requirements only**. All technical implementations (architecture, APIs, database design, etc.) are at the discretion of the development team.*
